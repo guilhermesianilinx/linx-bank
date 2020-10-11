@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Dataset\UserDataSet;
+use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -32,6 +34,18 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        return 'store';
+
+        $this->validate($request, User::$createRules);
+
+        $userDataSet = new UserDataSet(
+            $request->get('name'),
+            $request->get('cpf'),
+            $request->get('born_at'),
+        );
+
+        $newUser = $this->userRepository
+            ->createNewUser($userDataSet);
+
+        return response($newUser, 201);
     }
 }

@@ -11,7 +11,9 @@ use Laravel\Lumen\Auth\Authorizable;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, HasFactory;
+    use Authenticatable;
+    use Authorizable;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -29,5 +31,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     protected $hidden = [
         'password',
+    ];
+
+    public static $createRules = [
+        'name' => 'required|string|between:5,50',
+        'cpf' => 'required|string|size:11',
+        'born_at' => 'required|date|date_format:Y-m-d'
     ];
 }

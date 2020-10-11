@@ -3,10 +3,13 @@
 namespace Test\Http\Controllers;
 
 use App\Repositories\UserRepository;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Laravel\Lumen\Testing\DatabaseTransactions as TestingDatabaseTransactions;
 use TestCase;
 
 class UserControllerTest extends TestCase
 {
+    use TestingDatabaseTransactions;
 
     private UserRepository $userRepository;
 
@@ -58,11 +61,37 @@ class UserControllerTest extends TestCase
 
     public function testShouldNewUserCreated()
     {
-        $this->post('api/v1/users');
+        $this->post(
+            'api/v1/users',
+            [
+                'name' => 'teste',
+                'cpf' => '12345678910',
+                'born_at' => '1980-10-20'
+            ]
+        );
+        $expectedResult = 201;
 
         $this->assertEquals(
-            'store',
-            $this->response->getContent()
+            $expectedResult,
+            $this->response->getStatusCode()
+        );
+    }
+
+    public function testShouldReturnRighHttpStatusCodeWhenRequestValidationFails()
+    {
+        $this->post(
+            'api/v1/users',
+            [
+                'name' => 'teste',
+                'cpf' => '1234567891',
+                'born_at' => '1980-10-20'
+            ]
+        );
+        $expectedResult = 422;
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->response->getStatusCode()
         );
     }
 }
