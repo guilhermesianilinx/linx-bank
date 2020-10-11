@@ -35,8 +35,24 @@ class UserControllerTest extends TestCase
         $userId = 1;
         $this->get("api/v1/users/{$userId}");
 
+        $user = $this->userRepository->findUserById($userId);
+        $expectedResult = json_encode($user);
+
         $this->assertEquals(
-            "show {$userId}", $this->response->getContent()
+            $expectedResult,
+            $this->response->getContent()
+        );
+    }
+
+    public function testShouldReturnHttpStatusNotFoundWhenUserNotFound()
+    {
+        $userId = 0;
+        $expectedResult = 404;
+        $this->get("api/v1/users/{$userId}");
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->response->getStatusCode()
         );
     }
 
@@ -45,8 +61,8 @@ class UserControllerTest extends TestCase
         $this->post('api/v1/users');
 
         $this->assertEquals(
-            'store', $this->response->getContent()
+            'store',
+            $this->response->getContent()
         );
     }
-
 }

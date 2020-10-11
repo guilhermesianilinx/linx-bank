@@ -13,6 +13,7 @@ interface UserRepositoryInterface
 
     public function getAllUsers(): Collection;
 
-    public function createNewUser(UserDataSet $user): array;
+    public function findUserById(int $id): array;
 
+    public function createNewUser(UserDataSet $user): array;
 }

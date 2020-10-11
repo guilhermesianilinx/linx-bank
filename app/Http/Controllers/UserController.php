@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\UserRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -15,19 +16,22 @@ class UserController extends Controller
         $this->userRepository = $userRepository;
     }
 
-    public function index() 
+    public function index()
     {
         return $this->userRepository->getAllUsers();
     }
 
     public function show(int $id)
     {
-        return 'show ' . $id;
+        try {
+            return $this->userRepository->findUserById($id);
+        } catch (ModelNotFoundException $exception) {
+            return response($exception->getMessage(), 404);
+        }
     }
 
     public function store(Request $request)
     {
         return 'store';
     }
-
 }
