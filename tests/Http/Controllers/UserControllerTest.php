@@ -2,16 +2,31 @@
 
 namespace Test\Http\Controllers;
 
+use App\Repositories\UserRepository;
 use TestCase;
 
 class UserControllerTest extends TestCase
 {
+
+    private UserRepository $userRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->userRepository = app(UserRepository::class);
+    }
+
     public function testShouldReturnAllUsers()
     {
         $this->get('api/v1/users');
 
+        $users = $this->userRepository->getAllUsers();
+        $expectedResult = json_encode($users->toArray());
+
         $this->assertEquals(
-            'all', $this->response->getContent()
+            $expectedResult,
+            $this->response->getContent()
         );
     }
 
