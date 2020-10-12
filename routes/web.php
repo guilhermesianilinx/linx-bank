@@ -25,4 +25,7 @@ $router->group(['prefix' => 'api/v1'], function() use ($router) {
 
     $router->post('/users/{id}/accounts/{type}', 'UserAccountController@store');
 
+    $router->post('/users/{id}/accounts/{accountId}/deposit', 'UserAccountTransactionController@makeDeposit');
+    $router->post('/users/{id}/accounts/{accountId}/withdraw', 'UserAccountTransactionController@makeWithDraw');
+
 });
