@@ -23,6 +23,8 @@ $router->group(['prefix' => 'api/v1'], function() use ($router) {
     $router->get('/users/{id}', 'UserController@show');
     $router->post('/users', 'UserController@store');
 
+    $router->post('/users/{userId}/accounts/savings', 'UserAccountController@storeSavingsAccount');
+    $router->post('/users/{userId}/accounts/checking', 'UserAccountController@storeCheckingAccount');
     $router->post('/users/{id}/accounts/{type}', 'UserAccountController@store');
 
     $router->post('/users/{id}/accounts/{accountId}/deposit', 'UserAccountTransactionController@makeDeposit');

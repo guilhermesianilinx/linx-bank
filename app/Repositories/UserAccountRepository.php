@@ -2,8 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Dataset\UserAccountDataset;
+use App\Dataset\UserAccount\UpdateUserAccountBalanceDataset;
+use App\Dataset\UserAccount\UserAccountDataset;
+use App\Exceptions\InsufficientFundsException;
 use App\Models\UserAccount;
+use DomainException;
 
 class UserAccountRepository implements UserAccountRepositoryInterface
 {
@@ -24,5 +27,25 @@ class UserAccountRepository implements UserAccountRepositoryInterface
         $this->userAccountEloquentModel->save();
 
         return $this->userAccountEloquentModel->toArray();
+    }
+
+    public function updateUserAccountBalance(UpdateUserAccountBalanceDataset $userAccountDataset): array
+    {
+
+        /** @var UserAccount */
+        $account = $this->userAccountEloquentModel
+            ->find($userAccountDataset->getAccountId());
+
+        $newBalance = $account->balance + $userAccountDataset->getTransactedAmount();
+        if ($newBalance < 0) {
+            throw new InsufficientFundsException(
+                $account->balance,
+                $userAccountDataset->getTransactedAmount());
+        }
+
+        $account->balance += $userAccountDataset->getTransactedAmount();
+        $account->save();
+
+        return $account->toArray();
     }
 }
