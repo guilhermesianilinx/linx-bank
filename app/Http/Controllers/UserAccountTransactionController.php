@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Dataset\UserAccountDepositTransactionDataset;
-use App\Dataset\UserAccountTransactionDataset;
-use App\Dataset\UserAccountWithdrawTransactionDataset;
-use App\Models\UserAccountTransaction;
-use App\Repositories\UserAccountTransactionRepositoryInterface;
+use App\Services\CreateUserAccountTransactionService;
 use Illuminate\Http\Request;
 
 class UserAccountTransactionController extends Controller
 {
 
-    private UserAccountTransactionRepositoryInterface $userAccountTransactionService;
+    private CreateUserAccountTransactionService $createUserAccountTransactionService;
 
-    public function __construct(UserAccountTransactionRepositoryInterface $userAccountTransactionService)
-    {
-        $this->userAccountTransactionService = $userAccountTransactionService;
+    public function __construct(
+        CreateUserAccountTransactionService $createUserAccountTransactionService
+    ) {
+        $this->createUserAccountTransactionService = $createUserAccountTransactionService;
     }
 
     public function makeDeposit(
@@ -25,14 +22,12 @@ class UserAccountTransactionController extends Controller
         int $accountId
     ) {
 
-        $transaction = new UserAccountDepositTransactionDataset(
-            $id,
-            $accountId,
-            $request->get('amount')
-        );
-
-        $newDeposit = $this->userAccountTransactionService
-        ->createNewAccountTransaction($transaction);
+        $newDeposit = $this->createUserAccountTransactionService
+            ->makeDeposit(
+                $id,
+                $accountId,
+                $request->get('amount')
+            );
 
         return response($newDeposit, 201);
     }
@@ -42,14 +37,13 @@ class UserAccountTransactionController extends Controller
         int $id,
         int $accountId
     ) {
-        $transaction = new UserAccountWithdrawTransactionDataset(
-            $id,
-            $accountId,
-            $request->get('amount')
-        );
 
-        $newWithdraw = $this->userAccountTransactionService
-            ->createNewAccountTransaction($transaction);
+        $newWithdraw = $this->createUserAccountTransactionService
+            ->makeWithdraw(
+                $id,
+                $accountId,
+                $request->get('amount')
+            );
 
         return response($newWithdraw, 201);
     }
