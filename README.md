@@ -21,7 +21,8 @@ Implemenntação do desafio proposto
 
 - Copiar .env.example para .env substituindo credencias de bando de dados
 
-- Rodar migrations
+- Rodar migrations: 
+``` php artisan migrate:fresh --seed ```
 
 ## Utilização endpoints
 
