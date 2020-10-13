@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Dataset\UserAccount\UpdateUserAccountBalanceDataset;
 use App\Dataset\UserAccount\UserAccountCheckingDataset;
 use App\Dataset\UserAccount\UserAccountSavingsDataset;
 use App\Dataset\UserAccountDepositTransactionDataset;
@@ -14,13 +13,16 @@ class CreateUserAccountService
 
     private UserAccountRepositoryInterface $userAccountRepository;
     private UserAccountTransactionRepositoryInterface $userAccountTransactionRepository;
+    private CreateUserAccountTransactionService $createUserAccountTransactionService;
 
     public function __construct(
         UserAccountRepositoryInterface $userAccountRepository,
-        UserAccountTransactionRepositoryInterface $userAccountTransactionRepository
+        UserAccountTransactionRepositoryInterface $userAccountTransactionRepository,
+        CreateUserAccountTransactionService $createUserAccountTransactionService
     ) {
         $this->userAccountRepository = $userAccountRepository;
         $this->userAccountTransactionRepository = $userAccountTransactionRepository;
+        $this->createUserAccountTransactionService = $createUserAccountTransactionService;
     }
 
     public function createSavingsAccountWithBalance(
@@ -32,23 +34,10 @@ class CreateUserAccountService
             new UserAccountSavingsDataset($userId)
         );
 
-        $accountTransaction = $this->userAccountTransactionRepository
-            ->createNewAccountTransaction(
-                new UserAccountDepositTransactionDataset(
-                    $userId,
-                    $account['id'],
-                    $initialBalance
-                )
-            );
+        $transaction = $this->createUserAccountTransactionService
+            ->makeDeposit($userId, $account['id'], $initialBalance);
 
-        $account = $this->userAccountRepository->updateUserAccountBalance(
-            new UpdateUserAccountBalanceDataset(
-                $accountTransaction['user_account_id'],
-                $accountTransaction['transacted_amount'],
-            )
-        );
-
-        return $account;
+        return $transaction['account'];
     }
 
     public function createCheckingAccountWithBalance(
@@ -60,18 +49,9 @@ class CreateUserAccountService
             new UserAccountCheckingDataset($userId)
         );
 
-        $accountTransaction = $this->userAccountTransactionRepository
-            ->createNewAccountTransaction(
-                new UserAccountDepositTransactionDataset(
-                    $userId,
-                    $account['id'],
-                    $initialBalance
-                )
-            );
+        $transaction = $this->createUserAccountTransactionService
+            ->makeDeposit($userId, $account['id'], $initialBalance);
 
-        return array_merge(
-            $account,
-            ['balance' => $accountTransaction['transacted_amount']]
-        );
+        return $transaction['account'];
     }
 }

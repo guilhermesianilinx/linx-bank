@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Dataset\UserAccount\UpdateUserAccountBalanceDataset;
 use App\Dataset\UserAccountDepositTransactionDataset;
+use App\Dataset\UserAccountTransactionDataset;
 use App\Dataset\UserAccountWithdrawTransactionDataset;
 use App\Repositories\UserAccountRepositoryInterface;
 use App\Repositories\UserAccountTransactionRepositoryInterface;
@@ -48,8 +50,22 @@ class CreateUserAccountTransactionService
             $depositAmount
         );
 
-        return $this->userAccountTransactionRepository
-            ->createNewAccountTransaction($transaction);
+        $this->organizeBanknotes($transaction);
+
+        $transaction = $this->userAccountTransactionRepository
+                ->createNewAccountTransaction($transaction);
+
+        $account = $this->userAccountRepository->updateUserAccountBalance(
+            new UpdateUserAccountBalanceDataset(
+                $transaction['user_account_id'],
+                $transaction['transacted_amount'],
+            )
+        );
+    
+            return array_merge(
+                $transaction,
+                ['account' => $account]
+            );
     }
 
     private function validateWithdraw(UserAccountWithdrawTransactionDataset $transactionDataset): void
@@ -78,7 +94,7 @@ class CreateUserAccountTransactionService
         }
     }
 
-    private function organizeBanknotes(UserAccountWithdrawTransactionDataset $transactionDataset): void
+    private function organizeBanknotes(UserAccountTransactionDataset $transactionDataset): void
     {
 
         $usedBanknotes = [];
@@ -116,20 +132,32 @@ class CreateUserAccountTransactionService
     public function makeWithdraw(
         int $userId,
         int $accountId,
-        int $depositAmount
+        int $transactionAmount
     ): array {
 
         $transaction = new UserAccountWithdrawTransactionDataset(
             $userId,
             $accountId,
-            $depositAmount
+            $transactionAmount
         );
 
         $this->validateWithdraw($transaction);
 
         $this->organizeBanknotes($transaction);
 
-        return $this->userAccountTransactionRepository
+        $transaction = $this->userAccountTransactionRepository
             ->createNewAccountTransaction($transaction);
+
+        $account = $this->userAccountRepository->updateUserAccountBalance(
+            new UpdateUserAccountBalanceDataset(
+                $transaction['user_account_id'],
+                $transaction['transacted_amount'],
+            )
+        );
+
+        return array_merge(
+            $transaction,
+            ['account' => $account]
+        );
     }
 }
