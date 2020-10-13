@@ -20,7 +20,7 @@ class CreateUsersAccountsWithdrawalsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('user_account_id');
-            $table->unsignedInteger('amount_withdrawn');
+            $table->integer('amount_withdrawn');
             $table->timestamps();
 
             $table->foreign('user_id')
