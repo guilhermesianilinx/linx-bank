@@ -21,7 +21,7 @@ Implemenntação do desafio proposto
 
 - Copiar .env.example para .env substituindo credencias de bando de dados
 
-- Rodar migrations: 
+- Já existe um database.sqlite para representar um banco de dados, se for utilizado outra configuração é necessário rodar migrations:
 ``` php artisan migrate:fresh --seed ```
 
 ## Utilização endpoints
