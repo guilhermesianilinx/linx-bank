@@ -7,6 +7,7 @@ use App\Dataset\UserAccount\UserAccountDataset;
 use App\Exceptions\InsufficientFundsException;
 use App\Models\UserAccount;
 use DomainException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserAccountRepository implements UserAccountRepositoryInterface
 {
@@ -16,6 +17,17 @@ class UserAccountRepository implements UserAccountRepositoryInterface
     public function __construct(UserAccount $userAccountModel)
     {
         $this->userAccountEloquentModel = $userAccountModel;
+    }
+
+    public function findAccountById(int $id): array
+    {
+        $account = $this->userAccountEloquentModel->find($id);
+
+        if ($account === null) {
+            throw new ModelNotFoundException();
+        }
+
+        return $account->toArray();
     }
 
     public function createNewUserAccount(UserAccountDataset $userAccountDataset): array

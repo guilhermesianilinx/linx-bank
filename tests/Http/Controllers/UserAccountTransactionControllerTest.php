@@ -50,4 +50,20 @@ class UserAccountTransactionControllerTest extends TestCase
             $this->response->getStatusCode()
         );
     }
+
+    public function testShouldReturnInvalidHttpStatusCodeWhenWithdrawIsInvalid()
+    {
+        $this->post(
+            'api/v1/users/1/accounts/1/withdraw',
+            [
+                'amount' => 19
+            ]
+        );
+        $expectedResult = 422;
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->response->getStatusCode()
+        );
+    }
 }

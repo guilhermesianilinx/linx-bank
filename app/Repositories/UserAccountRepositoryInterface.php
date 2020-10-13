@@ -11,6 +11,8 @@ interface UserAccountRepositoryInterface
 
     public function __construct(UserAccount $userAccountModel);
 
+    public function findAccountById(int $id): array;
+
     public function createNewUserAccount(UserAccountDataset $userAccountDataset): array;
 
     public function updateUserAccountBalance(UpdateUserAccountBalanceDataset $userAccountDataset): array;

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\CreateUserAccountTransactionService;
+use DomainException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserAccountTransactionController extends Controller
 {
@@ -38,13 +40,24 @@ class UserAccountTransactionController extends Controller
         int $accountId
     ) {
 
-        $newWithdraw = $this->createUserAccountTransactionService
+        try {
+
+            $newWithdraw = $this->createUserAccountTransactionService
             ->makeWithdraw(
                 $id,
                 $accountId,
                 $request->get('amount')
             );
 
-        return response($newWithdraw, 201);
+            return response($newWithdraw, 201);
+
+        } catch (DomainException $exception) {
+
+            Log::error("ERRO AO REALIZAR SAQUE");
+            Log::error($exception);
+
+            return response($exception->getMessage(), 422);
+        }
+        
     }
 }

@@ -32,4 +32,9 @@ abstract class UserAccountTransactionDataset
     {
         return $this->transactedAmount * $this->getTransactionFactor();
     }
+
+    public function getAbsoluteTransactedAmount(): int
+    {
+        return $this->transactedAmount;
+    }
 }
