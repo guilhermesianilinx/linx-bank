@@ -46,6 +46,7 @@ class UserAccountRepository implements UserAccountRepositoryInterface
 
         /** @var UserAccount */
         $account = $this->userAccountEloquentModel
+            ->lockForUpdate()
             ->find($userAccountDataset->getAccountId());
 
         $newBalance = $account->balance + $userAccountDataset->getTransactedAmount();

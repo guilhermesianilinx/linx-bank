@@ -10,6 +10,7 @@ use App\Repositories\UserAccountRepositoryInterface;
 use App\Repositories\UserAccountTransactionRepositoryInterface;
 use DomainException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class CreateUserAccountTransactionService
 {
@@ -50,6 +51,8 @@ class CreateUserAccountTransactionService
             $depositAmount
         );
 
+        DB::beginTransaction();
+
         $this->organizeBanknotes($transaction);
 
         $transaction = $this->userAccountTransactionRepository
@@ -61,11 +64,13 @@ class CreateUserAccountTransactionService
                 $transaction['transacted_amount'],
             )
         );
-    
-            return array_merge(
-                $transaction,
-                ['account' => $account]
-            );
+
+        DB::commit();
+
+        return array_merge(
+            $transaction,
+            ['account' => $account]
+        );
     }
 
     private function validateWithdraw(UserAccountWithdrawTransactionDataset $transactionDataset): void
@@ -135,6 +140,8 @@ class CreateUserAccountTransactionService
         int $transactionAmount
     ): array {
 
+        DB::beginTransaction();
+
         $transaction = new UserAccountWithdrawTransactionDataset(
             $userId,
             $accountId,
@@ -154,6 +161,8 @@ class CreateUserAccountTransactionService
                 $transaction['transacted_amount'],
             )
         );
+
+        DB::commit();
 
         return array_merge(
             $transaction,
