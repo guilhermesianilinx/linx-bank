@@ -78,6 +78,41 @@ class CreateUserAccountTransactionService
         }
     }
 
+    private function organizeBanknotes(UserAccountWithdrawTransactionDataset $transactionDataset): void
+    {
+
+        $usedBanknotes = [];
+        $absoluteWithdrawAmount = $transactionDataset->getAbsoluteTransactedAmount();
+
+        foreach ($this->availableBanknotes->reverse() as $banknote) {
+
+            if ($absoluteWithdrawAmount === 0) {
+                $usedBanknotes[$banknote] = [
+                        'units' => 0,
+                        'total' => 0
+                ];
+                continue;
+            }
+
+            $rest = $absoluteWithdrawAmount % $banknote;
+            $banknoteUnits = floor($absoluteWithdrawAmount / $banknote);
+            $usedBanknotes[$banknote] = [
+                'units' => (int) $banknoteUnits,
+                'total' => $absoluteWithdrawAmount - $rest
+            ];
+            $absoluteWithdrawAmount = $rest;
+        }
+
+        if ($absoluteWithdrawAmount > 0) {
+            throw new DomainException(
+                "Valor solicitado não é válido de acordo com as cédulas disponível: " .
+                $this->availableBanknotes
+            );
+        }
+
+        $transactionDataset->setUsedBanknotes($usedBanknotes);
+    }
+
     public function makeWithdraw(
         int $userId,
         int $accountId,
@@ -91,6 +126,8 @@ class CreateUserAccountTransactionService
         );
 
         $this->validateWithdraw($transaction);
+
+        $this->organizeBanknotes($transaction);
 
         return $this->userAccountTransactionRepository
             ->createNewAccountTransaction($transaction);

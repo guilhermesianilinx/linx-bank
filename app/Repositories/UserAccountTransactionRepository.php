@@ -20,6 +20,7 @@ class UserAccountTransactionRepository implements UserAccountTransactionReposito
         $this->userAccountTransactionEloquentModel->user_id = $userAccountTransactionDataset->getUserId();
         $this->userAccountTransactionEloquentModel->user_account_id = $userAccountTransactionDataset->getUserAccountId();
         $this->userAccountTransactionEloquentModel->transacted_amount = $userAccountTransactionDataset->getTransactedAmount();
+        $this->userAccountTransactionEloquentModel->used_banknotes = $userAccountTransactionDataset->getUsedBanknotes();
         $this->userAccountTransactionEloquentModel->save();
 
         return $this->userAccountTransactionEloquentModel->toArray();

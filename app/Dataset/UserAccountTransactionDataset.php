@@ -8,6 +8,7 @@ abstract class UserAccountTransactionDataset
     private int $userId;
     private int $userAccountId;
     private int $transactedAmount;
+    private string $usedBanknotes;
 
     public function __construct(int $userId, int $userAccountId, int $transactedAmount)
     {
@@ -36,5 +37,15 @@ abstract class UserAccountTransactionDataset
     public function getAbsoluteTransactedAmount(): int
     {
         return $this->transactedAmount;
+    }
+
+    public function setUsedBanknotes(array $banknotes): void
+    {
+        $this->usedBanknotes = json_encode($banknotes);
+    }
+
+    public function getUsedBanknotes(): string
+    {
+        return $this->usedBanknotes;
     }
 }
